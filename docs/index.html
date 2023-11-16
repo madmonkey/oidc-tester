@@ -2,11 +2,11 @@
 <html>
 
 <head>
-    <title>OpenID Connect</title>
+    <title>psteniusubi.github.io</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <link rel="icon" href="../assets/common/images/favicon.png" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" type="text/css" href="../assets/common/styles/ubisecure.css" referrerpolicy="no-referrer" />
+    <link rel="icon" href="./assets/common/images/favicon.png" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="./assets/common/styles/ubisecure.css" referrerpolicy="no-referrer" />
     <style type="text/css">
         :root {
             --font-size: 12pt;
@@ -14,18 +14,12 @@
         }
     </style>
     <script type="module">
-        import { parsed } from "../assets/common/modules/document-promises.js";
-        import { create_repository_menu, set_button_href_handlers } from "../assets/common/modules/helper-module.js";
+        import { parsed } from "./assets/common/modules/document-promises.js";
+        import { create_repository_menu, set_button_href_handlers } from "./assets/common/modules/helper-module.js";
         async function build_page() {
             await parsed;
             await create_repository_menu();
             await set_button_href_handlers();
-            const initiate_login = new URLSearchParams(location.search.substring(1));
-            if (initiate_login.has("iss")) {
-                const url = new URL("authorization-code-flow.html", location.href);
-                url.hash = "#" + initiate_login;
-                location.assign(url);
-            }
         }
         build_page();
     </script>
@@ -35,11 +29,9 @@
 
     <header>
         <nav>
-            <button href="./index.html" target="_self">
+            <button href="/" target="_self">
                 <icon class="home"></icon>&nbsp;<span>Home</span>
             </button>
-            <button href="authorization-code-flow.html" target="_self">Tester</button>
-            <button href="configuration.html" target="_self">Configuration</button>
             <div>
                 <button>
                     <span>Repositories</span>&nbsp;<icon class="arrow-drop-down"></icon>
@@ -56,11 +48,13 @@
 
     <main>
         <section class="outline">
-            <h1>OpenID Connect Tester</h1>
+            <h1>psteniusubi.github.io</h1>
             <div>
                 <ul>
-                    <li><a href="configuration.html">Manage identity providers and client registrations</a></li>
-                    <li><a href="authorization-code-flow.html">Test authorization code flow</a></li>
+                    <li><a href="/SimpleSPA">JavaScript Single Page Application and Ubisecure SSO</a></li>
+                    <li><a href="/oidc-tester">OpenID Connect Tester</a></li>
+                    <li><a href="/push-demo/v2">Push Notifications</a></li>
+                    <li><a href="/webauthn-tester">WebAuthn API Tester, Web Crypto</a></li>
                 </ul>
             </div>
         </section>

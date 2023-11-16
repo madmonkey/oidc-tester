@@ -1,0 +1,20 @@
+:root, :link, :visited, * {
+    box-sizing: border-box;
+    cursor: unset;
+    color: unset;
+    background-color: unset;
+    margin: unset; 
+    padding: unset;
+    outline: unset;
+    border: unset;
+    border-radius: unset;
+    border-spacing: unset;
+    border-collapse: unset;
+    box-shadow: unset;
+    font: unset;
+    line-height: unset;
+    text-decoration: unset;
+    text-transform: unset;
+    text-indent: unset;
+    text-align: unset;
+}

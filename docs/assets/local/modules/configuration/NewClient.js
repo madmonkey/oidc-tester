@@ -1,4 +1,4 @@
-import { ModalDialog } from "../../../../../assets/common/modules/ModalDialog.js";
+import { ModalDialog } from "../../../common/modules/ModalDialog.js";
 
 export class NewClient extends ModalDialog {
     constructor(id, issuer) {

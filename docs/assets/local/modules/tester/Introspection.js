@@ -1,6 +1,6 @@
-import { parsed } from "../../../../../assets/common/modules/document-promises.js";
+import { parsed } from "../../../common/modules/document-promises.js";
 import { hide_all_sections, toggle_section, show_section, hide_section, get_form_value, is_form_valid, create_form_input, remove_empty_values, format_http_error } from "./helpers.js";
-import { http_get, http_post } from "../../../../../assets/common/modules/fetch.js";
+import { http_get, http_post } from "../../../common/modules/fetch.js";
 import { Events } from "./Events.js";
 
 export class Introspection {

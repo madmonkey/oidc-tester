@@ -1,5 +1,5 @@
 import { atobUrlSafe } from "./base64url.js";
-import { getAlgorithm, importJWK } from "../../../../webauthn-tester/assets/local/modules/Crypto.js";
+import { getAlgorithm, importJWK } from "./Crypto.js";
 
 class Completion {
     constructor() {
@@ -49,7 +49,7 @@ async function decode_jwt(jwt, jwks) {
         body = JSON.parse(s);
     } catch {
         // ignore error
-        body = null; 
+        body = null;
     }
 
     const text2verify = Uint8Array.from(jws[0] + "." + jws[1], t => t.charCodeAt(0));

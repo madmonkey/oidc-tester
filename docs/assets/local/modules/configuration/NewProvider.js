@@ -1,5 +1,5 @@
-import { ModalDialog } from "../../../../../assets/common/modules/ModalDialog.js";
-import { http_get } from "../../../../../assets/common/modules/fetch.js";
+import { ModalDialog } from "../../../common/modules/ModalDialog.js";
+import { http_get } from "../../../common/modules/fetch.js";
 import { format_http_error } from "../tester/helpers.js";
 
 export class NewProvider extends ModalDialog {

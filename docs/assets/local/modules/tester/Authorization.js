@@ -1,4 +1,4 @@
-import { parsed } from "../../../../../assets/common/modules/document-promises.js";
+import { parsed } from "../../../common/modules/document-promises.js";
 import { hide_all_sections, toggle_section, show_section, hide_section, get_form_value, create_form_input, remove_empty_values, random_text, redirect_uri_pattern, redirect_uri_title } from "./helpers.js";
 import { get_code_challenge_methods, new_code_verifier, get_code_challenge } from "../../../common/modules/pkce.js";
 import { Events } from "./Events.js";

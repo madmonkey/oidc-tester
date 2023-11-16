@@ -1,0 +1,23 @@
+section.popup {
+    position: absolute;
+    z-index: 1;
+    display: grid;
+    grid-template-areas:
+        "a  a    a"
+        "b1 main b2"
+        "c  c    c";
+    grid-template-rows: 1fr fit-content(40%) 2fr;
+    grid-template-columns: auto minmax(auto, 60em) auto;
+    border: none;
+    margin: 0;
+    background-color: rgb(230, 230, 230, 66%);
+    width: 100%;
+    height: 100%;
+}
+
+section.popup>section {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--ubisecure-body-background-color);
+}

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>OpenID Connect</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="icon" href="assets/common/images/favicon.png" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="assets/common/styles/ubisecure.css" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="./assets/local/styles/collapsed.css" referrerpolicy="no-referrer" />
+    <style type="text/css">
+        :root {
+            --font-size: 12pt;
+            --grid-main-area-width: minmax(auto, 72em);
+        }
+
+        section>form input:invalid,
+        section>form input[name*="error"] {
+            outline: 2px solid salmon;
+            outline-offset: -2px;
+        }
+
+        section.collapsed>h2>label,
+        section.collapsed>h3>label {
+            cursor: pointer;
+        }
+    </style>
+    <script type="module">
+        import { parsed } from "./assets/common/modules/document-promises.js";
+        import { create_repository_menu, set_button_href_handlers, set_table_select_handlers } from "./assets/common/modules/helper-module.js";
+        import { Configuration } from "./assets/local/modules/configuration.js";
+        import { http_get, http_post } from "./assets/common/modules/fetch.js";
+        import { hide_all_sections, toggle_section, show_section, hide_section, get_form_value, create_form_input } from "./assets/local/modules/tester/helpers.js";
+        import { Authorization } from "./assets/local/modules/tester/Authorization.js";
+        import { AccessToken } from "./assets/local/modules/tester/AccessToken.js";
+        import { IdToken } from "./assets/local/modules/tester/IdToken.js";
+        import { Introspection } from "./assets/local/modules/tester/Introspection.js";
+        import { UserInfo } from "./assets/local/modules/tester/UserInfo.js";
+        const configuration = new Configuration();
+        const authorization = new Authorization(configuration);
+        const access_token = new AccessToken(configuration);
+        const id_token = new IdToken(configuration);
+        const introspection = new Introspection(configuration);
+        const userinfo = new UserInfo(configuration);
+        async function build_page() {
+            await parsed;
+            await set_button_href_handlers();
+            await authorization.bind();
+            await access_token.bind();
+            await id_token.bind();
+            await introspection.bind();
+            await userinfo.bind();
+
+            const initiate_login = new URLSearchParams(location.hash.substr(1));
+            if (initiate_login.has("iss")) {
+                const issuer = initiate_login.get("iss");
+                let client = null;
+                if (initiate_login.has("client_id")) {
+                    client = configuration.get_client(issuer, initiate_login.get("client_id"));
+                } else {
+                    client = configuration.get_client_list(issuer)[0] || {};
+                }
+                configuration.set_active(issuer, client.index);
+            }
+
+            await authorization.init_request();
+            if (initiate_login.has("login_hint")) {
+                authorization.request.form["login_hint"].value = initiate_login.get("login_hint");
+            }
+            authorization.request.toggle(true);
+
+            const search = location.search;
+            history.replaceState(null, null, location.pathname);
+            await authorization.init_response(search, true);
+
+            await access_token.init_request();
+            await id_token.init_request();
+            await introspection.init_request();
+            await userinfo.init_request();
+        }
+        build_page();
+    </script>
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <button href="./index.html" target="_self">
+                <icon class="home"></icon>&nbsp;<span>Home</span>
+            </button>
+            <button href="authorization-code-flow.html" target="_self">Tester</button>
+            <button href="configuration.html" target="_self">Configuration</button>
+        </nav>
+        <nav>
+            <button href="https://ubisecure.com" class="ubisecure-standard-logo-h-reverse">&nbsp;</button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="outline">
+            <section id="authorization_request" class="collapsed">
+                <input type="checkbox" id="authorization_request_hide" checked />
+                <h2><label for="authorization_request_hide">Authorization Request</label></h2>
+                <section>
+                    <form autocomplete="off" novalidate>
+                        <label>
+                            <span>authorization_endpoint</span>
+                            <input class="flex1" type="text" placeholder="authorization_endpoint"
+                                name="authorization_endpoint" required />
+                        </label>
+                        <label>
+                            <span>response_type</span>
+                            <input class="flex1" type="text" placeholder="response_type" name="response_type"
+                                required />
+                        </label>
+                        <label>
+                            <span>client_id</span>
+                            <input class="flex1" type="text" placeholder="client_id" name="client_id" required />
+                        </label>
+                        <label>
+                            <span>redirect_uri</span>
+                            <input class="flex1" type="text" placeholder="redirect_uri" name="redirect_uri" />
+                        </label>
+                        <label>
+                            <span>scope</span>
+                            <input class="flex1" type="text" placeholder="scope" name="scope" />
+                        </label>
+                        <label>
+                            <span>state</span>
+                            <input class="flex1" type="text" placeholder="state" name="state" />
+                        </label>
+                        <label>
+                            <span>nonce</span>
+                            <input class="flex1" type="text" placeholder="nonce" name="nonce" />
+                        </label>
+                        <label>
+                            <span>login_hint</span>
+                            <input class="flex1" type="text" placeholder="login_hint" name="login_hint" />
+                        </label>
+                        <label>
+                            <span>display</span>
+                            <input class="flex1" type="text" placeholder="display" name="display" />
+                        </label>
+                        <label>
+                            <span>max_age</span>
+                            <input class="flex1" type="text" placeholder="max_age" name="max_age" />
+                        </label>
+                        <label>
+                            <span>prompt</span>
+                            <select class="flex1" placeholder="prompt" name="prompt">
+                                <option></option>
+                                <option>none</option>
+                                <option>login</option>
+                                <option>consent</option>
+                                <option>select_account</option>
+                            </select>
+                        </label>
+                        <label>
+                            <span>ui_locales</span>
+                            <input class="flex1" type="text" placeholder="ui_locales" name="ui_locales" />
+                        </label>
+                        <label>
+                            <span>acr_values</span>
+                            <input class="flex1" type="text" placeholder="acr_values" name="acr_values" />
+                        </label>
+                        <label>
+                            <span>code_challenge_method</span>
+                            <select class="flex1" placeholder="code_challenge_method" name="code_challenge_method">
+                                <option></option>
+                                <option>plain</option>
+                                <option>S256</option>
+                            </select>
+                        </label>
+                        <label>
+                            <span>code_challenge</span>
+                            <input class="flex1" type="text" placeholder="code_challenge" name="code_challenge" />
+                        </label>
+                        <div>
+                            <button type="submit">GET</button>
+                            <button type="reset">Reset</button>
+                        </div>
+                    </form>
+                </section>
+            </section>
+            <section id="authorization_response" class="collapsed">
+                <input type="checkbox" id="authorization_response_hide" checked />
+                <h3><label for="authorization_response_hide">Authorization Response</label></h3>
+                <section>
+                    <form autocomplete="off">
+                    </form>
+                </section>
+            </section>
+        </section>
+
+        <section class="outline">
+            <section id="token_request" class="collapsed">
+                <input type="checkbox" id="token_request_hide" checked />
+                <h2><label for="token_request_hide">Token Request</label></h2>
+                <section>
+                    <form autocomplete="off" novalidate>
+                        <label>
+                            <span>token_endpoint</span>
+                            <input class="flex1" type="text" placeholder="token_endpoint" name="token_endpoint"
+                                required />
+                        </label>
+                        <label>
+                            <span>grant_type</span>
+                            <input class="flex1" type="text" placeholder="grant_type" name="grant_type" required />
+                        </label>
+                        <label>
+                            <span>code</span>
+                            <input class="flex1" type="text" placeholder="code" name="code" required />
+                        </label>
+                        <label>
+                            <span>code_verifier</span>
+                            <input class="flex1" type="text" placeholder="code_verifier" name="code_verifier" />
+                        </label>
+                        <label>
+                            <span>redirect_uri</span>
+                            <input class="flex1" type="text" placeholder="redirect_uri" name="redirect_uri" />
+                        </label>
+                        <label>
+                            <span>client_id</span>
+                            <input class="flex1" type="text" placeholder="client_id" name="client_id" required />
+                        </label>
+                        <label>
+                            <span>client_secret</span>
+                            <input class="flex1" type="text" placeholder="client_secret" name="client_secret" />
+                        </label>
+                        <div>
+                            <button type="submit">POST</button>
+                            <button type="reset">Reset</button>
+                        </div>
+                    </form>
+                </section>
+            </section>
+            <section id="token_response" class="collapsed">
+                <input type="checkbox" id="token_response_hide" checked />
+                <h3><label for="token_response_hide">Token Response</label></h3>
+                <section>
+                    <form autocomplete="off">
+                    </form>
+                </section>
+            </section>
+        </section>
+
+        <section class="outline">
+            <section id="id_token" class="collapsed">
+                <input type="checkbox" id="id_token_hide" checked />
+                <h2><label for="id_token_hide">ID Token</label></h2>
+                <section>
+                    <form autocomplete="off" novalidate>
+                        <label>
+                            <span>jwks_uri</span>
+                            <input class="flex1" type="text" placeholder="jwks_uri" name="jwks_uri" required />
+                        </label>
+                        <label>
+                            <span>id_token</span>
+                            <input class="flex1" type="text" placeholder="id_token" name="id_token" required />
+                        </label>
+                        <div>
+                            <button type="submit">Decode</button>
+                            <button type="reset">Reset</button>
+                        </div>
+                    </form>
+                </section>
+            </section>
+            <section id="id_token_decoded" class="collapsed">
+                <input type="checkbox" id="id_token_decoded_hide" checked />
+                <h3><label for="id_token_decoded_hide">ID Token Decoded</label></h3>
+                <section>
+                    <form autocomplete="off">
+                    </form>
+                </section>
+            </section>
+        </section>
+
+        <section class="outline">
+            <section id="introspection_request" class="collapsed">
+                <input type="checkbox" id="introspection_request_hide" checked />
+                <h2><label for="introspection_request_hide">Introspection Request</label></h2>
+                <section>
+                    <form autocomplete="off" novalidate>
+                        <label>
+                            <span>introspection_endpoint</span>
+                            <input class="flex1" type="text" placeholder="introspection_endpoint"
+                                name="introspection_endpoint" required />
+                        </label>
+                        <label>
+                            <span>token</span>
+                            <input class="flex1" type="text" placeholder="token" name="token" required />
+                        </label>
+                        <label>
+                            <span>client_id</span>
+                            <input class="flex1" type="text" placeholder="client_id" name="client_id" required />
+                        </label>
+                        <label>
+                            <span>client_secret</span>
+                            <input class="flex1" type="text" placeholder="client_secret" name="client_secret" />
+                        </label>
+                        <div>
+                            <button type="submit">POST</button>
+                            <button type="reset">Reset</button>
+                        </div>
+                    </form>
+                </section>
+            </section>
+            <section id="introspection_response" class="collapsed">
+                <input type="checkbox" id="introspection_response_hide" checked />
+                <h3><label for="introspection_response_hide">Introspection Response</label></h3>
+                <section>
+                    <form autocomplete="off">
+                    </form>
+                </section>
+            </section>
+        </section>
+
+        <section class="outline">
+            <section id="userinfo_request" class="collapsed">
+                <input type="checkbox" id="userinfo_request_hide" checked />
+                <h2><label for="userinfo_request_hide">UserInfo Request</label></h2>
+                <section>
+                    <form autocomplete="off" novalidate>
+                        <label>
+                            <span>userinfo_endpoint</span>
+                            <input class="flex1" type="text" placeholder="userinfo_endpoint" name="userinfo_endpoint"
+                                required />
+                        </label>
+                        <label>
+                            <span>access_token</span>
+                            <input class="flex1" type="text" placeholder="access_token" name="access_token" required />
+                        </label>
+                        <div>
+                            <button type="submit" name="get">GET</button>
+                            <button type="submit" name="post">POST</button>
+                            <button type="reset">Reset</button>
+                        </div>
+                    </form>
+                </section>
+            </section>
+            <section id="userinfo_response" class="collapsed">
+                <input type="checkbox" id="userinfo_response_hide" checked />
+                <h3><label for="userinfo_response_hide">UserInfo Response</label></h3>
+                <section>
+                    <form autocomplete="off">
+                    </form>
+                </section>
+            </section>
+        </section>
+    </main>
+
+</body>
+
+</html>

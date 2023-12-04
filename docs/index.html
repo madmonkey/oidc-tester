@@ -2,24 +2,86 @@
 <html>
 
 <head>
-    <title>psteniusubi.github.io</title>
+    <title>OpenID Connect</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="icon" href="./assets/common/images/favicon.png" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="./assets/common/styles/ubisecure.css" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="./assets/common/styles/ModalDialog.css"
+        referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="./assets/local/styles/collapsed.css" referrerpolicy="no-referrer" />
     <style type="text/css">
         :root {
             --font-size: 12pt;
             --grid-main-area-width: minmax(auto, 72em);
         }
+
+        table th:first-of-type,
+        table td:first-of-type {
+            width: 2em;
+            text-align: center;
+            padding-right: 0;
+        }
+
+        tr.active td:first-of-type::after {
+            font-family: 'Material Icons';
+            content: "check";
+        }
+
+        td {
+            line-height: 1.25em;
+            height: 2em;
+            vertical-align: middle;
+        }
+
+        form textarea[name='metadata'] {
+            white-space: pre;
+            word-wrap: normal;
+            word-break: normal;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            font-family: monospace;
+            resize: vertical;
+            height: 15em;
+        }
+
+        section>form input:invalid,
+        section>form input.error,
+        section>form textarea.error {
+            outline: 2px solid salmon;
+            outline-offset: -2px;
+        }
     </style>
     <script type="module">
         import { parsed } from "./assets/common/modules/document-promises.js";
-        import { create_repository_menu, set_button_href_handlers } from "./assets/common/modules/helper-module.js";
+        import { create_repository_menu, set_button_href_handlers, set_table_select_handlers } from "./assets/common/modules/helper-module.js";
+        import { ModalDialog } from "./assets/common/modules/ModalDialog.js";
+        import { NewProvider } from "./assets/local/modules/configuration/NewProvider.js";
+        import { NewClient } from "./assets/local/modules/configuration/NewClient.js";
+        import { Configuration } from "./assets/local/modules/configuration.js";
+        import { Providers } from "./assets/local/modules/configuration/Providers.js";
+        import { Clients } from "./assets/local/modules/configuration/Clients.js";
+        const configuration = new Configuration();
+        const providers = new Providers(configuration, "idp");
+        const clients = new Clients(configuration, "client", providers);
         async function build_page() {
             await parsed;
-            await create_repository_menu();
             await set_button_href_handlers();
+            document.querySelectorAll("table.select").forEach(set_table_select_handlers);
+
+            providers.build();
+            providers.selected = configuration.get_active_issuer();
+
+            clients.build();
+            clients.selected = configuration.get_active_client();
+
+            const query = new URLSearchParams(location.hash.substr(1));
+            if (query.has("issuer")) {
+                history.replaceState(null, null, location.pathname);
+                providers.add_provider_dialog({
+                    "issuer": query.get("issuer")
+                })
+            }
         }
         build_page();
     </script>
@@ -29,17 +91,11 @@
 
     <header>
         <nav>
-            <button href="/" target="_self">
+            <button href="./index.html" target="_self">
                 <icon class="home"></icon>&nbsp;<span>Home</span>
             </button>
-            <div>
-                <button>
-                    <span>Repositories</span>&nbsp;<icon class="arrow-drop-down"></icon>
-                </button>
-                <div id="repository_menu">
-                    <button href="https://github.com/psteniusubi?tab=repositories">All Repositories</button>
-                </div>
-            </div>
+            <button href="authorization-code-flow.html" target="_self">Tester</button>
+            <button href="configuration.html" target="_self">Configuration</button>
         </nav>
         <nav>
             <button href="https://ubisecure.com" class="ubisecure-standard-logo-h-reverse">&nbsp;</button>
@@ -47,19 +103,154 @@
     </header>
 
     <main>
-        <section class="outline">
-            <h1>psteniusubi.github.io</h1>
-            <div>
-                <ul>
-                    <li><a href="/SimpleSPA">JavaScript Single Page Application and Ubisecure SSO</a></li>
-                    <li><a href="/oidc-tester">OpenID Connect Tester</a></li>
-                    <li><a href="/push-demo/v2">Push Notifications</a></li>
-                    <li><a href="/webauthn-tester">WebAuthn API Tester, Web Crypto</a></li>
-                </ul>
-            </div>
+        <section class="outline" id="idp">
+            <h1>Identity Provider</h1>
+            <section class="scroll">
+                <table class="hover select">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Instant</th>
+                            <th>Issuer</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+            <form>
+                <div>
+                    <button type="button" name="add">New</button>
+                    <button type="button" name="edit">Edit</button>
+                    <button type="button" name="login">Login</button>
+                    <button type="button" name="remove">Remove</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="outline" id="client">
+            <h2>Client</h2>
+            <section class="scroll">
+                <table class="hover select">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Instant</th>
+                            <th>Uri</th>
+                            <th>Id</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+            <section>
+                <form>
+                    <div>
+                        <button type="button" name="add">New</button>
+                        <button type="button" name="edit">Edit</button>
+                        <button type="button" name="active">Set Active</button>
+                        <button type="button" name="login">Login</button>
+                        <button type="button" name="remove">Remove</button>
+                    </div>
+                </form>
+            </section>
         </section>
     </main>
 
 </body>
+
+<template id="idp-dialog">
+    <section class="outline">
+        <h2>Identity Provider</h2>
+        <form novalidate>
+            <div><input class="flex1" type="text" placeholder="Issuer" name="issuer" required /></div>
+            <div>
+                <button type="button" name="fetch">
+                    <icon>cloud_download</icon>&nbsp;<span>Fetch metadata</span>
+                </button>
+                <button type="button" name="paste">
+                    <icon>content_paste</icon>&nbsp;<span>Paste from Clipboard</span>
+                </button>
+                <button type="button" name="clear">
+                    <icon>clear</icon>&nbsp;<span>Clear</span>
+                </button>
+            </div>
+            <div><textarea class="flex1" placeholder="Metadata" name="metadata"></textarea></div>
+            <label>
+                <span>authorization_endpoint</span>
+                <input class="flex1" type="text" placeholder="authorization_endpoint" name="authorization_endpoint"
+                    required />
+            </label>
+            <label>
+                <span>token_endpoint</span>
+                <input class="flex1" type="text" placeholder="token_endpoint" name="token_endpoint" required />
+            </label>
+            <label>
+                <span>userinfo_endpoint</span>
+                <input class="flex1" type="text" placeholder="userinfo_endpoint" name="userinfo_endpoint" />
+            </label>
+            <label>
+                <span>introspection_endpoint</span>
+                <input class="flex1" type="text" placeholder="introspection_endpoint" name="introspection_endpoint" />
+            </label>
+            <label>
+                <span>jwks_uri</span>
+                <input class="flex1" type="text" placeholder="jwks_uri" name="jwks_uri" />
+            </label>
+            </div>
+            <div>
+                <button type="submit">OK</button>
+                <button type="reset">Close</button>
+            </div>
+        </form>
+    </section>
+</template>
+
+<template id="client-dialog">
+    <section class="outline">
+        <h2>Client</h2>
+        <form novalidate>
+            <div>
+                <button type="button" name="copy">
+                    <icon>content_copy</icon>&nbsp;<span>Copy to Clipboard</span>
+                </button>
+                <button type="button" name="paste">
+                    <icon>content_paste</icon>&nbsp;<span>Paste from Clipboard</span>
+                </button>
+                <button type="button" name="clear">
+                    <icon>clear</icon>&nbsp;<span>Clear</span>
+                </button>
+            </div>
+            <div><textarea class="flex1" placeholder="Metadata" name="metadata"></textarea></div>
+            <label>
+                <span>redirect_uris</span>
+                <input class="flex1" type="text" placeholder="redirect_uris" name="redirect_uris" />
+            </label>
+            <label>
+                <span>initiate_login_uri</span>
+                <input class="flex1" type="text" placeholder="initiate_login_uri" name="initiate_login_uri" />
+            </label>
+            <label>
+                <span>scope</span>
+                <input class="flex1" type="text" placeholder="scope" name="scope" />
+            </label>
+            <label>
+                <span>client_uri</span>
+                <input class="flex1" type="text" placeholder="client_uri" name="client_uri" />
+            </label>
+            <label>
+                <span>client_id</span>
+                <input class="flex1" type="text" placeholder="client_id" name="client_id" required />
+            </label>
+            <label>
+                <span>client_secret</span>
+                <input class="flex1" type="text" placeholder="client_secret" name="client_secret" />
+            </label>
+            <div>
+                <button type="submit">OK</button>
+                <button type="reset">Close</button>
+            </div>
+        </form>
+    </section>
+</template>
 
 </html>

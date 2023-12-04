@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="e01f6cb5-9d8a-402d-b1dc-2c52f2d114b1" name="apache" url="http://localhost:63342/">
+        <fileTransfer mountedRoot="C:\code\oidc-tester\docs" accessType="MOUNT" port="0" />
+      </webServer>
+    </option>
+  </component>
+</project>

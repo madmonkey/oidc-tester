@@ -1,0 +1,324 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans");
+@import url("https://fonts.googleapis.com/css?family=Raleway:wght@700");
+@import url("https://fonts.googleapis.com/css?family=Material+Icons");
+@import url("ubisecure-standard-logo.css");
+@import url("reset.css");
+
+/* variables */
+
+:root {
+    --font-size: 11pt;
+
+    --grid-main-area-width: 1fr;
+
+    --ubisecure-primary-color: white;
+    --ubisecure-primary-background-color: #28a7f0;
+
+    --ubisecure-accent-one: #ff541e;
+    --ubisecure-accent-two: #52CAB8;
+
+    --ubisecure-standard-blue: #0c73ac;
+    --ubisecure-image-overlay-blue: #0367a1;
+    --ubisecure-dark-background-blue: #152435;
+    --ubisecure-blue: #083aae;
+
+    --ubisecure-light-gray: #e6e6e6;
+    --ubisecure-mid-gray: #b2b2b2;
+    --ubisecure-dark-gray: #383838;
+    --ubisecure-black: #000000;
+
+    --ubisecure-body-color: var(--ubisecure-black);
+    --ubisecure-body-background-color: white;
+    --ubisecure-header-color: white;
+    --ubisecure-header-background-color: var(--ubisecure-primary-background-color);
+    --ubisecure-menu-color: var(--ubisecure-black);
+    --ubisecure-menu-background-color: var(--ubisecure-light-gray);
+    --ubisecure-outline-color: var(--ubisecure-mid-gray);
+    --ubisecure-button-background-color: var(--ubisecure-light-gray);
+
+    --ubisecure-raleway-font: "Raleway", sans-serif;
+    --ubisecure-open-sans-font: "Open Sans", sans-serif;    
+}
+
+
+/* global */
+
+:root {
+    font-family: var(--ubisecure-open-sans-font);
+    font-size: var(--font-size);
+    line-height: 1.25em;
+}
+
+/* body grid */
+
+body, section.body {
+    display: grid;
+    grid-template-areas:
+    "header-left header header-right"
+    "left main right"
+    "footer-left footer footer-right";
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: auto var(--grid-main-area-width) auto;
+}
+
+body > header, section.body > header {
+    grid-area: header;
+}
+
+body > main, section.body > main {
+    grid-area: main;
+}
+
+body > footer, section.body > footer {
+    grid-area: footer;
+}
+
+/* header and footer */
+
+header, footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    color: var(--ubisecure-header-color);
+    background-color: var(--ubisecure-header-background-color);
+}
+
+/* header navigation menu */
+
+nav {
+    display: flex;
+    flex-direction: row;
+}
+
+nav button {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    padding: 0.5rem;
+    color: inherit;
+    background-color: inherit;
+}
+
+nav button:not(.label):hover, nav button:not(.label):focus-within {
+    outline: 2px solid var(--ubisecure-outline-color);
+    outline-offset: -2px;
+    color: var(--ubisecure-menu-color);
+    background-color: var(--ubisecure-menu-background-color);
+    cursor: pointer;
+}
+
+nav button:not(.label):active {
+    background-color: var(--ubisecure-outline-color);
+}
+
+nav button.label {
+    user-select: all;
+}
+
+nav > div > div {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    color: var(--ubisecure-header-color);
+    background-color: var(--ubisecure-header-background-color);
+}
+
+nav > div:hover > div, nav > div:focus-within > div {
+    display: flex;    
+    flex-direction: column;
+}
+
+/* body sections */ 
+
+section {
+    margin: 1rem 0.5rem;
+}
+section > * {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+section:not(.scroll) > :not(table):last-child {
+    margin-bottom: 1rem;
+}
+section.outline > * {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+section.outline {
+    border: 1px solid var(--ubisecure-outline-color);
+    box-shadow: 0.25rem 0.25rem 0.5rem -0.25rem var(--ubisecure-mid-gray);
+}
+
+/* table */
+
+section > table {
+    width: 100%;
+    margin: unset;
+    text-align: left;
+    table-layout: fixed;
+    border: 1px solid var(--ubisecure-outline-color);
+    box-shadow: 0.25rem 0.25rem 0.5rem -0.25rem var(--ubisecure-mid-gray);
+}
+
+section > table > thead, section > table > tbody > tr:nth-child(even) {
+    background-color: var(--ubisecure-light-gray)
+}
+section > table > thead {
+    font-weight: bold;
+}
+section > table > thead > tr > th, section > table > tbody > tr > td {
+    padding: 0.25rem 0.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* table hovering */
+
+section > table.hover > tbody > tr:hover {
+    background-color: var(--ubisecure-mid-gray);
+    cursor: pointer;
+}
+
+/* table row selected */
+
+table > tbody > tr.selected:nth-child(n) {
+    background-color: var(--ubisecure-mid-gray);
+}
+
+/* table scrolling */
+
+section.scroll {
+    overflow-y: scroll;
+    max-height: 33vh;
+    border: 1px solid var(--ubisecure-outline-color);
+    box-shadow: 0.25rem 0.25rem 0.5rem -0.25rem var(--ubisecure-mid-gray);
+}
+section.scroll > table {
+    border: unset;
+}
+
+/* form */
+
+section > form > * {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    margin: 0.5rem 0;
+    gap: 0.5rem;
+}
+
+section > form input, section > form textarea, section > form select {
+    outline: 1px solid var(--ubisecure-outline-color);
+    outline-offset: -1px;
+    min-width: 0;
+    height: 1.75rem;
+    padding: 0 0.5rem;
+}
+section > form button {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    height: 1.75rem;
+}
+section > form button:active {
+    background-color: var(--ubisecure-outline-color);
+}
+section > form textarea { 
+    padding-top: 0.2rem;
+    resize: vertical;
+}
+
+section > form *:focus, section > form input:hover, section > form textarea:hover, section > form select:hover, section > form button:hover {
+    outline: 2px solid var(--ubisecure-outline-color);
+    outline-offset: -2px;
+    cursor: pointer;
+}
+
+section > form label {
+    /* display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start; */
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* form columns */
+
+.flex1 { flex:1; }
+.flex2 { flex:2; }
+.flex3 { flex:3; }
+.flex4 { flex:4; }
+.flex5 { flex:5; }
+.flex6 { flex:6; }
+
+/* standard styles */
+
+h1 { 
+    font-size: calc(var(--font-size) * 2.5); 
+    line-height: 1.25em;
+}
+h2 { 
+    font-size: calc(var(--font-size) * 2.0); 
+    line-height: 1.25em;
+}
+h3 { 
+    font-size: calc(var(--font-size) * 1.75); 
+    line-height: 1.25em;
+}
+h4 { 
+    font-size: calc(var(--font-size) * 1.5); 
+    line-height: 1.25em;
+}
+h5 { 
+    font-size: calc(var(--font-size) * 1.25); 
+    line-height: 1.25em;
+}
+h6 { 
+    font-size: calc(var(--font-size) * 1.0); 
+    line-height: 1.25em;
+}
+
+button { 
+    background-color: var(--ubisecure-button-background-color); 
+}
+
+ul, ol {
+    padding-left: 1rem;
+    margin-left: 1rem;
+}
+dl > dd, dl > dl {
+    padding-left: 1rem;
+}
+
+a:hover, a:focus {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* hidden */
+
+.hidden {
+    display: none;
+}
+
+/* icons */
+
+icon {
+    display: inline;
+    font-family: 'Material Icons';
+    vertical-align: bottom;
+}
+
+icon.home::after {
+    content: "home";
+}
+
+icon.arrow-drop-down::after {
+    content: "arrow_drop_down";
+}
+
+icon.content-copy::after {
+    content: "content_copy";
+}
